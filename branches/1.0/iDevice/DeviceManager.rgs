@@ -1,0 +1,17 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {70EB8BA4-DC9E-4DC8-A4A2-93EC37F019F3} = s 'FAR iOS Device Manager'
+		{
+			ForceRemove Programmable
+            val AppId = s '{70EB8BA4-DC9E-4DC8-A4A2-93EC37F019F3}'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			TypeLib = s '{3CE8473F-A575-4D60-B591-76C25D20B6E4}'
+			Version = s '1.0'
+		}
+	}
+}
