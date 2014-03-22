@@ -1,0 +1,102 @@
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+    uuid(3CE8473F-A575-4D60-B591-76C25D20B6E4),
+    version(1.0),
+]
+library iDeviceLib
+{
+    importlib("stdole2.tlb");
+    
+    [
+        uuid(A56709AE-2DE2-4E70-BAB9-5AEC8CFFDE29)
+    ]
+    typedef struct FileInfo
+    {
+        ULONG           attributes;
+        ULONGLONG       creationTime;
+        ULONGLONG       modificationTime;
+        ULONGLONG       size;
+        BSTR            name;
+    } FileInfo;
+
+    [
+        uuid(1792C860-EFDD-45C6-AB89-01886E17B1D0)
+    ]
+    typedef struct DeviceInfo
+    {
+        ULONGLONG       total;
+        ULONGLONG       free;
+    } DeviceInfo;
+
+    [
+        object,
+        uuid(2FAF2E41-F0D9-43B8-AF93-23403891D1B5),
+        dual,
+        nonextensible,
+        pointer_default(unique)
+    ]
+    interface IProgressCallback : IDispatch
+    {
+        HRESULT UpdateProgress([in] ULONG progress);
+    };
+
+    [
+        object,
+        uuid(A0814AAB-151D-4754-8980-22D7AF09167D),
+        dual,
+        nonextensible,
+        pointer_default(unique)
+    ]
+    interface IDevice : IDispatch
+    {
+        [propget, id(1)] HRESULT Id([out, retval] GUID* pVal);
+        [propget, id(2)] HRESULT Name([out, retval] BSTR* pVal);
+        [propget, id(3)] HRESULT IsValid([out, retval] VARIANT_BOOL* pVal);
+        [id(4)] HRESULT ListFiles([in] BSTR path, [in,out] SAFEARRAY(FileInfo) files);
+        [id(5)] HRESULT CreateDirectory([in] BSTR path);
+        [id(6)] HRESULT DeleteDirectory([in] BSTR path);
+        [id(7)] HRESULT GetFile([in] BSTR fromPath, [in] BSTR toPath, [in] IProgressCallback* cb);
+        [id(8)] HRESULT PutFile([in] BSTR fromPath, [in] BSTR toPath, [in] IProgressCallback* cb);
+        [id(9)] HRESULT DeleteFile([in] BSTR path);
+        [id(10)] HRESULT GetDeviceInfo([in, out] DeviceInfo* info);
+    };
+
+    [
+        object,
+        uuid(CFFAABFC-213F-48E6-95A1-9E161E6429E3),
+        dual,
+        nonextensible,
+        pointer_default(unique)
+    ]
+    interface IEnumDevices : IDispatch
+    {
+        [id(1)] HRESULT Clone([out] IEnumDevices **ppenum);
+        [id(2)] HRESULT Next([in] ULONG celt, [in,out] IDevice** rgelt, [in,out] ULONG* pceltFetched);
+        [id(3)] HRESULT Reset();
+        [id(4)] HRESULT Skip([in]  ULONG celt);
+    };
+
+    [
+        object,
+        uuid(9ED82FB2-0085-4C65-A5A4-CB1BB2A05F07),
+        dual,
+        nonextensible,
+        pointer_default(unique)
+    ]
+    interface IDeviceManager : IDispatch
+    {
+        [propget, id(1)] HRESULT Devices([out, retval] IEnumDevices** pVal);
+    };
+
+    [
+        uuid(70EB8BA4-DC9E-4DC8-A4A2-93EC37F019F3)      
+    ]
+    coclass DeviceManager
+    {
+        [default] interface IDeviceManager;
+    };
+};
+

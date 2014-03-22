@@ -1,0 +1,10 @@
+HKCR
+{
+    NoRemove AppId
+    {
+		ForceRemove {70EB8BA4-DC9E-4DC8-A4A2-93EC37F019F3} = s 'FAR iOS Plugin'
+		{
+            val DllSurrogate = s ''
+        }                
+    }
+}
