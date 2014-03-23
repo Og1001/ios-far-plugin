@@ -2,7 +2,6 @@
 #include "FarPlugin.h"
 #include "iFS.h"
 #include "DeviceBridge.h"
-#include "Dialog.h"
 
 // {1F085C43-61FD-4F7F-A11A-59528E4DB80A}
 DECLARE_GUID(kConfirmDeleteId, 0x1f085c43, 0x61fd, 0x4f7f, 0xa1, 0x1a, 0x59, 0x52, 0x8e, 0x4d, 0xb8, 0xa);
