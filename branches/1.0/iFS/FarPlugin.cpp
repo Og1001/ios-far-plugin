@@ -3,8 +3,8 @@
 
 #define VER_MAJOR 1
 #define VER_MINOR 1
-#define VER_REVISION 1
-#define VER_BUILD 1
+#define VER_REVISION 2
+#define VER_BUILD 2
 
 //---------------------------------------------------------------------------//
 // {34FCA795-CDDD-47C3-9507-45D4D40BD794}
@@ -66,7 +66,7 @@ void WINAPI GetPluginInfoW(struct PluginInfo *pInfo)
         return;
 
     pInfo->StructSize = sizeof(*pInfo);
-    pInfo->Flags = PF_NONE;
+    pInfo->Flags = PF_PRELOAD;
 
     if (!s_pluginInfo)
         s_pluginInfo = CreatePluginInfo();
