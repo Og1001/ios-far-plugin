@@ -147,7 +147,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DeviceBridge.h" />
-    <ClInclude Include="Dialog.h" />
     <ClInclude Include="iFS.h" />
     <ClInclude Include="FarPlugin.h" />
     <ClInclude Include="stdafx.h" />
