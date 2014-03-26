@@ -77,7 +77,7 @@ void ShowProgressDialog(std::wstring title, std::wstring file, int progress)
     CoCreateGuid(&guid);
     size_t width = 52;
     size_t len = progress * width / 100;
-    std::wstring prefix = std::wstring(L"File: ");
+    std::wstring prefix = GetString(STR_FILE) + std::wstring(L": ");
     std::wstring str = title + L"\n" + prefix + FitString(file, width - prefix.length()) + L"\n" + GetProgressString(progress, width);
     s_startupInfo.Message(&kPluginId, &guid, FMSG_ALLINONE|FMSG_LEFTALIGN, NULL, (const wchar_t* const*)str.c_str(), 0, 0);
     s_startupInfo.AdvControl(&kPluginId, ACTL_SETPROGRESSSTATE, TBPS_NORMAL, 0);
@@ -92,11 +92,11 @@ void ShowCopyProgressDialog(CopyInfo& info, size_t progress = 0)
     CoCreateGuid(&guid);
     size_t width = 52;
     wchar_t procStr[40];
-    wsprintf(procStr, L"%d of %d", info.completedFiles, info.totalFiles);
+    wsprintf(procStr, GetString(STR_N_OF_N).c_str(), info.completedFiles, info.totalFiles);
     ULONGLONG completedSize = info.completedSize + info.currentSize * progress / 100;
-    std::wstring str = info.title + L"\n" + info.verb + L" the file\n" + FitString(info.src, width) + L"\nto\n" + FitString(info.dst, width) + L"\n" +
-        GetProgressString(progress, width) + L"\n\1Total: " + FormatSize(info.totalSize) + L"\n" + GetProgressString((size_t)(completedSize * 100 / info.totalSize), width) + L"\n" +
-        L"Files processed: " + procStr;
+    std::wstring str = info.title + L"\n" + info.verb + L" " + GetString(STR_FILE1) + L"\n" + FitString(info.src, width) + L"\n" + GetString(STR_TO) + L"\n" + FitString(info.dst, width) + L"\n" +
+        GetProgressString(progress, width) + L"\n\1" + GetString(STR_TOTAL) + L": " + FormatSize(info.totalSize) + L"\n" + GetProgressString((size_t)(completedSize * 100 / info.totalSize), width) + L"\n" +
+        GetString(STR_FILES_PROCESSED) + L": " + procStr;
     s_startupInfo.Message(&kPluginId, &guid, FMSG_ALLINONE|FMSG_LEFTALIGN, NULL, (const wchar_t* const*)str.c_str(), 0, 0);
     s_startupInfo.AdvControl(&kPluginId, ACTL_SETPROGRESSSTATE, TBPS_NORMAL, 0);
     ProgressValue progressVal = { sizeof(ProgressValue), completedSize, info.totalSize };
@@ -117,7 +117,7 @@ bool ConfirmDialog(std::wstring title, std::wstring message)
 {
     GUID guid;
     CoCreateGuid(&guid);
-    std::wstring str = title + L"\n" + message + L"\nYes\nCancel";
+    std::wstring str = title + L"\n" + message + L"\n" + GetString(STR_YES) + L"\n" + GetString(STR_CANCEL);
     return s_startupInfo.Message(&kPluginId, &guid, FMSG_ALLINONE, NULL, (const wchar_t* const*)str.c_str(), 0, 2) == 0;
 }
 
@@ -128,7 +128,7 @@ int ErrorDialog(HRESULT hr, std::wstring description, std::wstring path, bool mu
     CoCreateGuid(&guid);
     WCHAR message[300];
     wsprintf(message, L"0x%08x", hr);
-    std::wstring str = std::wstring(L"Error\n") + message + L"\n" + description + L"\n" + FitString(path, 50) + (multiple ? L"\nRetry\nSkip\nSkip All\nCancel" : L"\nRetry\nCancel");
+    std::wstring str = GetString(STR_ERROR) + L"\n" + message + L"\n" + description + L"\n" + FitString(path, 50) + (multiple ? L"\n" + GetString(STR_RETRY) + L"\n" + GetString(STR_SKIP) + L"\n" + GetString(STR_SKIP_ALL) + L"\n" + GetString(STR_CANCEL) + L"" : L"\n" + GetString(STR_RETRY) + L"\n" + GetString(STR_CANCEL));
     return (int)s_startupInfo.Message(&kPluginId, &guid, FMSG_ALLINONE|FMSG_WARNING, NULL, (const wchar_t* const*)str.c_str(), 0, multiple ? 4 : 2);
 }
 
@@ -169,7 +169,7 @@ bool iFS::Init()
 void iFS::SetLastError(HRESULT err)
 {
     wchar_t str[256];
-    wsprintf(str, L"Operation failed (HRESULT: 0x%x)", err);
+    wsprintf(str, GetString(STR_OPERATION_FAILED).c_str(), err);
     m_lastError = str;
 }
 
@@ -259,12 +259,12 @@ intptr_t iFSPanel::SetDirectory(const std::wstring& dir, OPERATION_MODES mode)
 intptr_t iFSPanel::MakeDirectory(const std::wstring& dir, OPERATION_MODES mode)
 {
     std::wstring folder = dir;
-    if (!folder.empty() || InputBox(L"Make Folder", L"Create the folder:", folder))
+    if (!folder.empty() || InputBox(GetString(STR_MAKE_FOLDER), GetString(STR_CREATE_THE_FOLDER) + L":", folder))
     {
         std::wstring path = m_path + L"/" + folder;
         HRESULT hr = m_pDevice->CreateDirectory(CComBSTR(path.c_str()));
         if (FAILED(hr))
-            ErrorDialog(hr, L"Cannot create folder", folder);
+            ErrorDialog(hr, GetString(STR_CANNOT_CREATE_FOLDER), folder);
         return 1;
     }
     return -1;
@@ -402,7 +402,7 @@ intptr_t iFSPanel::DeleteFiles(std::wstring path, std::vector<FileInfoEx>& files
     for (size_t i = 0;i < files.size();i++)
     {
         std::wstring subPath = path + L"/" + files[i].name;
-        ShowProgressDialog(L"Deleting", subPath, progress * 100 / total);
+        ShowProgressDialog(GetString(STR_DELETING), subPath, progress * 100 / total);
         if (files[i].IsDirectory())
         {
             if (!DeleteFiles(subPath, files[i].children, mode, continueOnError, progress, total))
@@ -412,7 +412,7 @@ intptr_t iFSPanel::DeleteFiles(std::wstring path, std::vector<FileInfoEx>& files
         HRESULT hr = m_pDevice->DeleteFile(CComBSTR(subPath.c_str()));
         if (FAILED(hr) && !continueOnError)
         {
-            int result = ErrorDialog(hr, files[i].IsDirectory() ? L"Cannot delete folder" : L"Cannot delete file", subPath, true);
+            int result = ErrorDialog(hr, GetString(files[i].IsDirectory() ? STR_CANNOT_DELETE_FOLDER : STR_CANNOT_DELETE_FILE), subPath, true);
             if (result == 0)
                 i--;
             else if (result == 2)
@@ -420,7 +420,7 @@ intptr_t iFSPanel::DeleteFiles(std::wstring path, std::vector<FileInfoEx>& files
             else if (result != 1)
                 return FALSE;
         }
-        ShowProgressDialog(L"Deleting", subPath, ++progress * 100 / total);
+        ShowProgressDialog(GetString(STR_DELETING), subPath, ++progress * 100 / total);
     }
     return TRUE;
 }
@@ -447,15 +447,15 @@ intptr_t iFSPanel::DeleteFiles(PluginPanelItem* items, size_t count, OPERATION_M
     {
         WCHAR message[300];
         if (numFiles == 1 && numFolders == 0 || numFiles == 0 && numFolders == 1)
-            wsprintf(message, L"Do you wish to delete \"%s\"?", items[0].FileName);
+            wsprintf(message, GetString(STR_DO_YOU_WISH_TO_DELETE).c_str(), items[0].FileName);
         else
-            wsprintf(message, L"Do you wish to delete %d items?", count);
+            wsprintf(message, GetString(STR_DO_YOU_WISH_TO_DELETE2).c_str(), count);
 
-        if (!ConfirmDialog(L"Delete", message))
+        if (!ConfirmDialog(GetString(STR_DELETE), message))
             return FALSE;
     }
 
-    ShowProgressDialog(L"Deleting", L"", 0);
+    ShowProgressDialog(GetString(STR_DELETING), L"", 0);
     s_startupInfo.AdvControl(&kPluginId, ACTL_SETPROGRESSSTATE, TBPS_INDETERMINATE, 0);
 
     int total = 0;
@@ -495,7 +495,7 @@ intptr_t iFSPanel::GetFiles(std::wstring path, std::vector<FileInfoEx>& files, b
             {
                 if (!continueOnError)
                 {
-                    int result = ErrorDialog(HRESULT_FROM_WIN32(GetLastError()), L"Cannot create folder", dPath, true);
+                    int result = ErrorDialog(HRESULT_FROM_WIN32(GetLastError()), GetString(STR_CANNOT_CREATE_FOLDER), dPath, true);
                     if (result == 0)
                         i--;
                     else if (result == 2)
@@ -522,7 +522,7 @@ intptr_t iFSPanel::GetFiles(std::wstring path, std::vector<FileInfoEx>& files, b
                 return FALSE;
             if (FAILED(hr) && !continueOnError)
             {
-                int result = ErrorDialog(hr, L"Cannot copy file", sPath, true);
+                int result = ErrorDialog(hr, GetString(STR_CANNOT_COPY_FILE), sPath, true);
                 if (result == 0)
                     i--;
                 else if (result == 2)
@@ -536,7 +536,7 @@ intptr_t iFSPanel::GetFiles(std::wstring path, std::vector<FileInfoEx>& files, b
                 hr = m_pDevice->DeleteFile(CComBSTR(sPath.c_str()));
                 if (FAILED(hr) && !continueOnError)
                 {
-                    int result = ErrorDialog(hr, L"Cannot delete file", sPath, true);
+                    int result = ErrorDialog(hr, GetString(STR_CANNOT_DELETE_FILE), sPath, true);
                     if (result == 0)
                         i--;
                     else if (result == 2)
@@ -577,10 +577,10 @@ intptr_t iFSPanel::GetFiles(PluginPanelItem* items, size_t count, bool move, con
     {
         WCHAR message[300];
         if (numFiles == 1 && numFolders == 0 || numFiles == 0 && numFolders == 1)
-            wsprintf(message, L"%s \"%s\" to:", move ? L"Rename or move" : L"Copy", items[0].FileName);
+            wsprintf(message, GetString(move ? STR_RENAME_OR_MOVE : STR_COPY).c_str(), items[0].FileName);
         else
-            wsprintf(message, L"%s %d items to:", move ? L"Rename or move" : L"Copy", count);
-        if (InputBox(move ? L"Rename/Move" : L"Copy", message, folder))
+            wsprintf(message, GetString(move ? STR_RENAME_OR_MOVE2 : STR_COPY2).c_str(), count);
+        if (InputBox(GetString(move ? STR_RENAME_OR_MOVE3 : STR_COPY3), message, folder))
         {
             if (folder != *dstPath)
             {
@@ -633,7 +633,7 @@ intptr_t iFSPanel::PutFiles(std::wstring path, std::vector<FileInfoEx>& files, b
             {
                 if (!continueOnError)
                 {
-                    int result = ErrorDialog(hr, L"Cannot create folder", dPath, true);
+                    int result = ErrorDialog(hr, GetString(STR_CANNOT_CREATE_FOLDER), dPath, true);
                     if (result == 0)
                         i--;
                     else if (result == 2)
@@ -660,7 +660,7 @@ intptr_t iFSPanel::PutFiles(std::wstring path, std::vector<FileInfoEx>& files, b
                 return FALSE;
             if (FAILED(hr) && !continueOnError)
             {
-                int result = ErrorDialog(hr, L"Cannot copy file", sPath, true);
+                int result = ErrorDialog(hr, GetString(STR_CANNOT_COPY_FILE), sPath, true);
                 if (result == 0)
                     i--;
                 else if (result == 2)
@@ -673,7 +673,7 @@ intptr_t iFSPanel::PutFiles(std::wstring path, std::vector<FileInfoEx>& files, b
             {
                 if (!DeleteFileW(sPath.c_str()) && !continueOnError)
                 {
-                    int result = ErrorDialog(HRESULT_FROM_WIN32(GetLastError()), L"Cannot delete file", sPath, true);
+                    int result = ErrorDialog(HRESULT_FROM_WIN32(GetLastError()), GetString(STR_CANNOT_DELETE_FILE), sPath, true);
                     if (result == 0)
                         i--;
                     else if (result == 2)
@@ -714,10 +714,10 @@ intptr_t iFSPanel::PutFiles(PluginPanelItem* items, size_t count, bool move, con
     {
         WCHAR message[300];
         if (numFiles == 1 && numFolders == 0 || numFiles == 0 && numFolders == 1)
-            wsprintf(message, L"%s \"%s\" to:", move ? L"Rename or move" : L"Copy", items[0].FileName);
+            wsprintf(message, GetString(move ? STR_RENAME_OR_MOVE : STR_COPY).c_str(), items[0].FileName);
         else
-            wsprintf(message, L"%s %d items to:", move ? L"Rename or move" : L"Copy", count);
-        if (!InputBox(move ? L"Rename/Move" : L"Copy", message, folder))
+            wsprintf(message, GetString(move ? STR_RENAME_OR_MOVE2 : STR_COPY2).c_str(), count);
+        if (!InputBox(GetString(move ? STR_RENAME_OR_MOVE3 : STR_COPY3).c_str(), message, folder))
             return -1;
     }
 

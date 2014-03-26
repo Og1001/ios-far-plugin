@@ -3,8 +3,8 @@
 
 #define VER_MAJOR 1
 #define VER_MINOR 1
-#define VER_REVISION 2
-#define VER_BUILD 2
+#define VER_REVISION 3
+#define VER_BUILD 3
 
 //---------------------------------------------------------------------------//
 // {34FCA795-CDDD-47C3-9507-45D4D40BD794}
@@ -20,7 +20,7 @@ void ShowError(std::wstring message)
 {
     GUID msgid;
     CoCreateGuid(&msgid);
-    std::wstring str = L"Error\n";
+    std::wstring str = GetString(STR_ERROR) + L"\n";
     str += message;
     s_startupInfo.Message(&kPluginId, &msgid, FMSG_WARNING|FMSG_MB_OK|FMSG_ALLINONE, NULL, (const wchar_t**)str.c_str(), NULL, 0);
 }
@@ -42,6 +42,12 @@ __int64 GetSetting(FARSETTINGS_SUBFOLDERS root, const wchar_t* name)
 }
 
 //---------------------------------------------------------------------------//
+std::wstring GetString(int id)
+{
+    return s_startupInfo.GetMsg(&kPluginId, id);
+}
+
+//---------------------------------------------------------------------------//
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 {
     return TRUE; 
@@ -51,12 +57,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 void WINAPI GetGlobalInfoW(GlobalInfo *pInfo)
 {
     pInfo->StructSize = sizeof(GlobalInfo);
-    pInfo->MinFarVersion = MAKEFARVERSION(3, 0, 0, 0, VS_RELEASE);
+    pInfo->MinFarVersion = FARMANAGERVERSION;
     pInfo->Version = MAKEFARVERSION(VER_MAJOR, VER_MINOR, VER_REVISION, VER_BUILD, VS_RELEASE);
     pInfo->Guid = kPluginId;
     pInfo->Title = L"iFS";
-    pInfo->Description = L"FAR iOS Device Viewer";
-    pInfo->Author = L"Evgeny S";
+    pInfo->Description = L"Apple iOS File System for FAR Manager";
+    pInfo->Author = L"Evgeny Silin";
 }
 
 //---------------------------------------------------------------------------//

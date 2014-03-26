@@ -54,60 +54,6 @@ HRESULT CDevice::Init(AMDeviceRef handle)
     {
         std::vector<std::pair<const void*, const void*>> data;
         apps.getData(data);
-        /*
-        FILE* f = fopen("d:\\1.txt", "w");
-        std::vector<std::wstring> props;
-        for (size_t i = 0;i < data.size();i++)
-        {
-            CFDictionaryPtr descr = CFDictionaryPtr((CFDictionaryRef)data[i].second);
-            std::vector<std::pair<const void*, const void*>> appdata;
-            descr.getData(appdata);
-            for (size_t i = 0;i < appdata.size();i++)
-            {
-                CFTypeID keyType = CFGetTypeID((CFTypeRef)appdata[i].first);
-                if (keyType == CFStringGetTypeID())
-                {
-                    std::wstring name = CFStringPtr((CFStringRef)appdata[i].first);
-                    if (std::find(props.begin(), props.end(), name) == props.end())
-                        props.push_back(name);
-                }
-            }
-        }
-        for (size_t i = 0;i < props.size();i++)
-            fwprintf(f, L"%s\t", props[i].c_str());
-        fwprintf(f, L"\n");
-        for (size_t i = 0;i < data.size();i++)
-        {
-            std::wstring bundle = CFStringPtr((CFStringRef)data[i].first);
-
-            CFDictionaryPtr descr = CFDictionaryPtr((CFDictionaryRef)data[i].second);
-            std::wstring name = CFStringPtr((CFStringRef)CFDictionaryGetValue(descr, (CFStringRef)CFStringPtr(L"CFBundleDisplayName")));
-
-            for (size_t i = 0;i < props.size();i++)
-            {
-                const void* val = CFDictionaryGetValue(descr, (CFStringRef)CFStringPtr(props[i]));
-                CFTypeID valType = val ? CFGetTypeID((CFTypeRef)val) : 0;
-                std::wstring valStr;
-                if (valType == CFStringGetTypeID())
-                {
-                    valStr = CFStringPtr((CFStringRef)val);
-                    fwprintf(f, L"%s\t", valStr.c_str());
-                }
-                else if (valType == CFNumberGetTypeID())
-                {
-                    double dval = 0;
-                    CFNumberGetValue((CFNumberRef)val, kCFNumberDoubleType, &dval);
-                    fwprintf(f, L"%f\t", dval);
-                }
-                else
-                    fwprintf(f, L"%s\t", val ? L"unk" : L"");
-            }
-            if (!name.empty())
-                m_applications.insert(std::map<std::wstring, std::wstring>::value_type(name, bundle));
-            fwprintf(f, L"\n");
-        }
-        fclose(f);
-        */
 
         for (size_t i = 0;i < data.size();i++)
         {
