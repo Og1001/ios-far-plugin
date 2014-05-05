@@ -278,7 +278,6 @@ const PathMap s_pathMap[] =
 {
     { L"Books", L"Books" },
     { L"Camera", L"DCIM/100APPLE" },
-    { L"General", L"general_storage" },
     { L"Raw", L"" },
     { L"Recordings", L"Recordings" },
 };

@@ -136,7 +136,7 @@ void CDeviceManager::OnDeviceAdded(AMDeviceRef handle)
 void CDeviceManager::OnDeviceRemoved(AMDeviceRef device)
 {
     CAutoLock lock(m_cs);
-    auto itd = m_devices.find(device);
+	auto itd = m_devices.find(device);
     if (itd != m_devices.end())
     {
         CDevice* device = itd->second;

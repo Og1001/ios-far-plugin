@@ -37,3 +37,21 @@ std::wstring get_registry_value(std::wstring key, std::wstring value)
     }
     return res;
 }
+
+void trace(const wchar_t* str, ...)
+{
+	FILE* file = _wfopen(L"d:\\tools\\log", L"a");
+	if (file)
+	{
+		SYSTEMTIME time;
+		GetLocalTime(&time);
+		fwprintf(file, L"%02d.%02d.%04d %02d:%02d:%02d.%03d: ", time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
+
+		va_list args;
+		va_start(args, str);
+		vfwprintf(file, str, args);
+		fwprintf(file, L"\n");
+		va_end(args);
+		fclose(file);
+	}
+}
