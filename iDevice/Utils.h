@@ -182,3 +182,5 @@ std::wstring get_registry_value(std::wstring key, std::wstring value);
 #define HRESULT_FROM_WIN32(x) \
   ((HRESULT)(x) <= 0 ? ((HRESULT)(x)) \
 : ((HRESULT) (((x) & 0x0000FFFF) | (FACILITY_WIN32 << 16) | 0x80000000)))
+
+void trace(const wchar_t* str, ...);

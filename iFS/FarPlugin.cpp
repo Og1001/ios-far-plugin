@@ -3,8 +3,8 @@
 
 #define VER_MAJOR 1
 #define VER_MINOR 1
-#define VER_REVISION 3
-#define VER_BUILD 3
+#define VER_REVISION 4
+#define VER_BUILD 4
 
 //---------------------------------------------------------------------------//
 // {34FCA795-CDDD-47C3-9507-45D4D40BD794}
